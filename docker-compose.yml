@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: microservices-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: microservices_db
+      MYSQL_USER: devops_user
+      MYSQL_PASSWORD: devops_password_123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  user-service:
+    build: ./services/user-service
+    container_name: user-service
+    ports: 
+      - "5001:5001"
+    environment:
+      FLASK_ENV: production
+      SQLALCHEMY_DATABASE_URI: mysql+pymysql://devops_user:devops_password_123@mysql:3306/microservices_db
+    depends_on: 
+      mysql:
+        condition: service_healthy
+    networks:
+      - microservices-network
+  product-service:
+    build: ./services/product-service
+    container_name: product-service
+    ports:
+      - "5002:5002"
+    environment:
+      FLASK_ENV: production
+      SQLALCHEMY_DATABASE_URI: mysql+pymysql://devops_user:devops_password_123@mysql:3306/microservices_db
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    
+  order-service:
+      build: ./services/order-service
+      container_name: order-service
+      ports:
+        - "5003:5003"
+      environment:
+        FLASK_ENV: production
+        SQLALCHEMY_DATABASE_URI: mysql+pymysql://devops_user:devops_password_123@mysql:3306/microservices_db
+      depends_on: 
+        mysql:
+          condition: service_healthy
+      networks:
+        - microservices-network
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

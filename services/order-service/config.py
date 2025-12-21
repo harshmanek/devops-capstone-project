@@ -15,7 +15,12 @@ class Config:
     TESTING = False
     
     # Database Configuration
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://devops_user:devops_password_123@localhost/microservices_db'
+    SQLALCHEMY_DATABASE_URI = (
+        os.getenv('SQLALCHEMY_DATABASE_URI') 
+        or os.getenv('DATABASE_URL') 
+        or os.getenv('DATABASE_URI') 
+        or 'mysql+pymysql://devops_user:devops_password_123@mysql:3306/microservices_db')
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True  # Log SQL queries
     
