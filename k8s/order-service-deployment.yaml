@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+  namespace: microservices
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+        - name: order-service
+          image: order-service:1.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5003
+          env:
+            - name: FLASK_APP
+              value: "app.py"
+            - name: FLASK_ENV
+              value: "production"
+            - name: SQLALCHEMY_DATABASE_URI
+              value: "mysql+pymysql://devops_user:devops_password_123@mysql:3306/microservices_db"
+            - name: SERVICE_NAME
+              value: "order-service"
+            - name: SERVICE_PORT
+              value: "5003"
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5003
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5003
+            initialDelaySeconds: 10
+            periodSeconds: 5

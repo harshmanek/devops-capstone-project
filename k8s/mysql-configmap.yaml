@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+  namespace: microservices
+data:
+  MYSQL_ROOT_PASSWORD: "root"
+  MYSQL_DATABASE: "microservices"
+  MYSQL_USER: "devops_user"
+  MYSQL_PASSWORD: "devops_password_123"
