@@ -30,8 +30,9 @@ with app.app_context():
 
 # ==================== SERVICE ENDPOINTS ====================
 
-USER_SERVICE_URL = "http://localhost:5001"
-PRODUCT_SERVICE_URL = "http://localhost:5002"
+# Replace hardcoded URLs with Config values
+USER_SERVICE_URL = Config.USER_SERVICE_URL
+PRODUCT_SERVICE_URL = Config.PRODUCT_SERVICE_URL
 
 # ==================== HELPER FUNCTIONS ====================
 
@@ -46,7 +47,7 @@ def validate_user(user_id):
         dict: User data if valid, None if not found
     """
     try:
-        response = requests.get(f"{USER_SERVICE_URL}/users/{user_id}", timeout=5)
+        response = requests.get(f"{USER_SERVICE_URL}/users/{user_id}", timeout=Config.REQUEST_TIMEOUT)
         if response.status_code == 200:
             return response.json()
         return None
@@ -65,7 +66,7 @@ def validate_product(product_id):
         dict: Product data if valid, None if not found
     """
     try:
-        response = requests.get(f"{PRODUCT_SERVICE_URL}/products/{product_id}", timeout=5)
+        response = requests.get(f"{PRODUCT_SERVICE_URL}/products/{product_id}", timeout=Config.REQUEST_TIMEOUT)
         if response.status_code == 200:
             return response.json()
         return None
@@ -88,7 +89,7 @@ def reduce_product_stock(product_id, quantity):
         response = requests.patch(
             f"{PRODUCT_SERVICE_URL}/products/{product_id}/stock",
             json={"quantity_change": -quantity},
-            timeout=5
+            timeout=Config.REQUEST_TIMEOUT
         )
         return response.status_code == 200
     except Exception as e:
@@ -110,7 +111,7 @@ def restore_product_stock(product_id, quantity):
         response = requests.patch(
             f"{PRODUCT_SERVICE_URL}/products/{product_id}/stock",
             json={"quantity_change": quantity},
-            timeout=5
+            timeout=Config.REQUEST_TIMEOUT
         )
         return response.status_code == 200
     except Exception as e:
@@ -513,4 +514,5 @@ def internal_error(error):
 # ==================== RUN SERVER ====================
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5003, debug=True)
+    # Bind to 0.0.0.0 so the service is reachable from other containers/host
+    app.run(host='0.0.0.0', port=Config.SERVICE_PORT, debug=True)

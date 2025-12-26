@@ -14,4 +14,5 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     SERVICE_NAME = 'Product Service'
-    SERVICE_PORT = int(os.getenv('PRODUCT_SERVICE_PORT',5002))
+    SERVICE_PORT = int(os.getenv('SERVICE_PORT',5002))
+    REQUEST_TIMEOUT = int(os.getenv('REQUEST_TIMEOUT',5))  # seconds

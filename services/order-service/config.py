@@ -33,12 +33,12 @@ class Config:
     }
     
     # Service URLs
-    USER_SERVICE_URL = os.getenv('USER_SERVICE_URL', 'http://localhost:5001')
-    PRODUCT_SERVICE_URL = os.getenv('PRODUCT_SERVICE_URL', 'http://localhost:5002')
+    USER_SERVICE_URL = os.getenv('USER_SERVICE_URL', 'http://user-service:5001')
+    PRODUCT_SERVICE_URL = os.getenv('PRODUCT_SERVICE_URL', 'http://product-service:5002')
     
     # Request Timeout
-    REQUEST_TIMEOUT = 5  # seconds
-    
+    REQUEST_TIMEOUT = int(os.getenv('REQUEST_TIMEOUT',5))  # seconds
+    SERVICE_PORT = int(os.getenv('SERVICE_PORT', 5003))
     # CORS Settings
     CORS_HEADERS = 'Content-Type'
 

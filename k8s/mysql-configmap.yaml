@@ -5,6 +5,6 @@ metadata:
   namespace: microservices
 data:
   MYSQL_ROOT_PASSWORD: "root"
-  MYSQL_DATABASE: "microservices"
+  MYSQL_DATABASE: "microservices_db"
   MYSQL_USER: "devops_user"
   MYSQL_PASSWORD: "devops_password_123"

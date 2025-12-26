@@ -341,4 +341,4 @@ def internal_error(error):
 # ==================== RUN SERVER ====================
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5002, debug=True)
+    app.run(host='0.0.0.0', port=Config.SERVICE_PORT, debug=True)
