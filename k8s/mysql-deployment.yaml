@@ -13,6 +13,8 @@ spec:
       labels:
         app: mysql
     spec:
+      securityContext:
+        fsGroup: 999
       containers:
         - name: mysql
           image: mysql:8.0
@@ -32,13 +34,19 @@ spec:
               memory: "512Mi"
               cpu: "500m"
           livenessProbe:
-            exec:
-              command:
-                - /bin/bash
-                - -c
-                - mysqladmin ping -h localhost
-            initialDelaySeconds: 30
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
             periodSeconds: 10
+            failureThreshold: 6
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
       volumes:
         - name: mysql-storage
           persistentVolumeClaim:
