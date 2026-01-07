@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: microservices
+data:
+  microservices-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "Microservices Dashboard",
+        "panels": [
+          {
+            "title": "Pod CPU Usage",
+            "targets": [
+              {
+                "expr": "sum(rate(container_cpu_usage_seconds_total{pod=~\"user-service.*|product-service.*|order-service.*\"}[5m])) by (pod)"
+              }
+            ]
+          },
+          {
+            "title": "Pod Memory Usage",
+            "targets": [
+              {
+                "expr": "sum(container_memory_usage_bytes{pod=~\"user-service.*|product-service.*|order-service.*\"}) by (pod)"
+              }
+            ]
+          },
+          {
+            "title": "Request Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total[5m])) by (service)"
+              }
+            ]
+          },
+          {
+            "title": "Error Rate",
+            "targets": [
+              {
+                "expr": "sum(rate(http_requests_total{status=~\"5..\"}[5m])) by (service)"
+              }
+            ]
+          }
+        ]
+      }
+    }

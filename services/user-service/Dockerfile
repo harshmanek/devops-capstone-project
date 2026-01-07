@@ -1,21 +1,16 @@
-# here we are using official python runtime as parent image
-FROM python:3.12-slim
-
-#setting working directory
+# Multi-stage build for smaller images
+FROM python:3.12-slim as builder
 WORKDIR /app
-
-# Copy requirements first (for better caching, as the docker images are created in a layered manner we should write the layers first that are less likely to be changes frequently)
 COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
 
-# install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# copy the rest of the application
+FROM python:3.12-slim
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
 COPY . .
 
+ENV PATH=/root/.local/bin:$PATH
+ENV PYTHONUNBUFFERED=1
+
 EXPOSE 5001
-
-ENV FLASK_APP=app.py
-ENV FLASK_ENV=production
-
-CMD [ "python","app.py" ]
+CMD ["python", "app.py"]

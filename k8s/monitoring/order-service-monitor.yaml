@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: order-service-monitor
+  namespace: microservices
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  endpoints:
+  - port: "5003"
+    interval: 30s
+    path: /metrics
