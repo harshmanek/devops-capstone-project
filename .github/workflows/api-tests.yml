@@ -11,6 +11,9 @@ on:
 jobs:
   api-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     env:
       DATABASE_URL: mysql+pymysql://devops_user:devops_password_123@127.0.0.1:3306/microservices_db
     services:
@@ -52,29 +55,57 @@ jobs:
 
       - name: Start User Service
         run: |
+          mkdir -p ./logs
           cd services/user-service
-          python app.py &
-          sleep 2
+          nohup python app.py > ../../logs/user-service.log 2>&1 & echo $! > ../../logs/user-service.pid
+          for i in {1..30}; do curl -sS http://localhost:5001/health && break || (echo "waiting for user-service..." && sleep 1); done
+          tail -n 50 ../../logs/user-service.log || true
 
       - name: Start Product Service
         run: |
+          mkdir -p ./logs
           cd services/product-service
-          python app.py &
-          sleep 2
+          nohup python app.py > ../../logs/product-service.log 2>&1 & echo $! > ../../logs/product-service.pid
+          for i in {1..30}; do curl -sS http://localhost:5002/health && break || (echo "waiting for product-service..." && sleep 1); done
+          tail -n 50 ../../logs/product-service.log || true
 
       - name: Start Order Service
         run: |
+          mkdir -p ./logs
           cd services/order-service
-          python app.py &
-          sleep 2
+          nohup python app.py > ../../logs/order-service.log 2>&1 & echo $! > ../../logs/order-service.pid
+          for i in {1..30}; do curl -sS http://localhost:5003/health && break || (echo "waiting for order-service..." && sleep 1); done
+          tail -n 50 ../../logs/order-service.log || true
 
       - name: Health Check
         run: |
-          sleep 5
+          sleep 2
           curl -f http://localhost:5001/health || exit 1
           curl -f http://localhost:5002/health || exit 1
           curl -f http://localhost:5003/health || exit 1
           echo "✓ All services healthy"
 
+      - name: Dump service logs on failure
+        if: failure()
+        run: |
+          echo "=== user-service log ==="
+          tail -n 200 ./logs/user-service.log || true
+          echo "=== product-service log ==="
+          tail -n 200 ./logs/product-service.log || true
+          echo "=== order-service log ==="
+          tail -n 200 ./logs/order-service.log || true
+
       - name: Run comprehensive tests
-        run: bash test_all_services.sh
+        run: |
+          bash test_all_services.sh
+
+    - name: Dump service logs on failure
+      if: failure()
+      run: |
+        echo "=== user-service log ==="
+        tail -n 200 ./logs/user-service.log || true
+        echo "=== product-service log ==="
+        tail -n 200 ./logs/product-service.log || true
+        echo "=== order-service log ==="
+        tail -n 200 ./logs/order-service.log || true
+
