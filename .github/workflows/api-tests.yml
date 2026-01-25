@@ -57,6 +57,7 @@ jobs:
         run: |
           mkdir -p ./logs
           cd services/user-service
+          export SQLALCHEMY_DATABASE_URI="mysql+pymysql://devops_user:devops_password_123@127.0.0.1:3306/microservices_db"
           nohup python app.py > ../../logs/user-service.log 2>&1 & echo $! > ../../logs/user-service.pid
           for i in {1..30}; do curl -sS http://localhost:5001/health && break || (echo "waiting for user-service..." && sleep 1); done
           tail -n 50 ../../logs/user-service.log || true
@@ -65,6 +66,7 @@ jobs:
         run: |
           mkdir -p ./logs
           cd services/product-service
+          export SQLALCHEMY_DATABASE_URI="mysql+pymysql://devops_user:devops_password_123@127.0.0.1:3306/microservices_db"
           nohup python app.py > ../../logs/product-service.log 2>&1 & echo $! > ../../logs/product-service.pid
           for i in {1..30}; do curl -sS http://localhost:5002/health && break || (echo "waiting for product-service..." && sleep 1); done
           tail -n 50 ../../logs/product-service.log || true
@@ -73,6 +75,7 @@ jobs:
         run: |
           mkdir -p ./logs
           cd services/order-service
+          export SQLALCHEMY_DATABASE_URI="mysql+pymysql://devops_user:devops_password_123@127.0.0.1:3306/microservices_db"
           nohup python app.py > ../../logs/order-service.log 2>&1 & echo $! > ../../logs/order-service.pid
           for i in {1..30}; do curl -sS http://localhost:5003/health && break || (echo "waiting for order-service..." && sleep 1); done
           tail -n 50 ../../logs/order-service.log || true
