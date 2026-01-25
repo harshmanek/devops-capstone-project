@@ -99,13 +99,12 @@ jobs:
         run: |
           bash test_all_services.sh
 
-    - name: Dump service logs on failure
-      if: failure()
-      run: |
-        echo "=== user-service log ==="
-        tail -n 200 ./logs/user-service.log || true
-        echo "=== product-service log ==="
-        tail -n 200 ./logs/product-service.log || true
-        echo "=== order-service log ==="
-        tail -n 200 ./logs/order-service.log || true
-
+      - name: Dump service logs on failure
+        if: failure()
+        run: |
+          echo "=== user-service log ==="
+          tail -n 200 ./logs/user-service.log || true
+          echo "=== product-service log ==="
+          tail -n 200 ./logs/product-service.log || true
+          echo "=== order-service log ==="
+          tail -n 200 ./logs/order-service.log || true
