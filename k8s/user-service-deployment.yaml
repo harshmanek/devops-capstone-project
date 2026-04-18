@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: user-service:1.2
-          imagePullPolicy: Never
+          image: user-service:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5001
           env:

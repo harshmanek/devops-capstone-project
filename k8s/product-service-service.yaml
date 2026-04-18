@@ -7,7 +7,8 @@ spec:
   selector:
     app: product-service
   ports:
-    - protocol: TCP
+    - name: http-metrics
+      protocol: TCP
       port: 5002
       targetPort: 5002
   type: ClusterIP

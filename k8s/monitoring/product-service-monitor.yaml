@@ -8,6 +8,6 @@ spec:
     matchLabels:
       app: product-service
   endpoints:
-  - port: "5002"
+  - port: http-metrics
     interval: 30s
     path: /metrics

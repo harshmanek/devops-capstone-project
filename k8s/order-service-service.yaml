@@ -7,7 +7,8 @@ spec:
   selector:
     app: order-service
   ports:
-    - protocol: TCP
+    - name: http-metrics
+      protocol: TCP
       port: 5003
       targetPort: 5003
   type: ClusterIP
