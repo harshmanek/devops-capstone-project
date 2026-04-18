@@ -7,9 +7,19 @@ import hashlib
 from config import Config
 from models import db, User
 
+# Import Prometheus metrics
+from prometheus_flask_exporter import PrometheusMetrics
+
 # Initialize Flask application
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Initialize Prometheus metrics
+metrics = PrometheusMetrics(app)
+
+# Custom metrics
+from prometheus_client import Counter
+user_registrations = Counter('user_registrations_total', 'Total number of user registrations')
 
 # Initialize database with Flask app
 db.init_app(app)
@@ -59,6 +69,15 @@ def health():
         'service': 'User Service',
         'timestamp': datetime.utcnow().isoformat()
     }), 200
+
+# ============================================================================
+
+# METRICS ENDPOINT
+@app.route('/metrics', methods=['GET'])
+def metrics_endpoint():
+    """Expose Prometheus metrics"""
+    from prometheus_client import generate_latest
+    return generate_latest(), 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 # ============================================================================
 
@@ -125,6 +144,9 @@ def create_user():
         # Save to database
         db.session.add(user)
         db.session.commit()
+        
+        # Increment metrics
+        user_registrations.inc()
         
         return jsonify({
             'message': 'User created successfully',

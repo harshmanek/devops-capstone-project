@@ -11,9 +11,19 @@ import os
 from config import Config
 from models import db, Product
 
+# Import Prometheus metrics
+from prometheus_flask_exporter import PrometheusMetrics
+
 # Initialize Flask app
 app = Flask(__name__)
 app.config.from_object(Config)
+
+# Initialize Prometheus metrics
+metrics = PrometheusMetrics(app)
+
+# Custom metrics
+from prometheus_client import Counter
+product_creations = Counter('product_creations_total', 'Total number of products created')
 
 # Initialize database
 db.init_app(app)
@@ -94,6 +104,9 @@ def create_product():
         # Add to database
         db.session.add(product)
         db.session.commit()
+        
+        # Increment metrics
+        product_creations.inc()
         
         return jsonify({
             'message': 'Product created successfully',

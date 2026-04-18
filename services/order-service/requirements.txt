@@ -6,3 +6,4 @@ python-dotenv==1.0.0
 requests==2.31.0
 pytest==7.4.0
 Flask-Cors==3.0.10
+prometheus-flask-exporter==0.23.0
