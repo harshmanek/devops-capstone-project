@@ -43,7 +43,7 @@ jobs:
         pip install flask flask-sqlalchemy pymysql python-dotenv gunicorn werkzeug requests flask-cors prometheus-flask-exporter
 
     - name: Start services with Docker Compose
-      run: docker-compose up -d
+      run: docker compose up -d
   
     - name: Wait for services to be healthy
       run: |
