@@ -41,32 +41,26 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flask flask-sqlalchemy pymysql python-dotenv gunicorn werkzeug requests flask-cors prometheus-flask-exporter
-    
-    - name: Wait for MySQL
+
+    - name: Start services with Docker Compose
+      run: docker-compose up -d
+  
+    - name: Wait for services to be healthy
       run: |
-        for i in {1..30}; do
-          mysql -h 127.0.0.1 -u devops_user -pdevops_password_123 -e "SELECT 1" && break
+        for i in {1..60}; do
+          if curl -f http://localhost:5001/health && \
+             curl -f http://localhost:5002/health && \
+             curl -f http://localhost:5003/health; then
+            echo "✓ All services healthy"
+            break
+          fi
+          echo "Waiting for services... ($i/60)"
           sleep 1
         done
     
-    - name: Start User Service
-      run: |
-        cd services/user-service
-        python app.py &
-        sleep 2
-    
-    - name: Start Product Service
-      run: |
-        cd services/product-service
-        python app.py &
-        sleep 2
-    
-    - name: Start Order Service
-      run: |
-        cd services/order-service
-        python app.py &
-        sleep 2
-    
+    - name: Run comprehensive tests
+      run: bash test_all_services.sh
+      
     - name: Health Check
       run: |
         sleep 5
